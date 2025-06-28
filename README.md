@@ -1,64 +1,168 @@
-<p align="center">
-  <a href="https://www.medusajs.com">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/59018053/229103275-b5e482bb-4601-46e6-8142-244f531cebdb.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    <img alt="Medusa logo" src="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    </picture>
-  </a>
-</p>
-<h1 align="center">
-  Medusa Plugin Starter
-</h1>
+# Medusa RBAC Plugin
 
-<h4 align="center">
-  <a href="https://docs.medusajs.com">Documentation</a> |
-  <a href="https://www.medusajs.com">Website</a>
-</h4>
+A comprehensive Role-Based Access Control (RBAC) plugin for MedusaJS v2 that provides fine-grained permission management for your Medusa application.
 
-<p align="center">
-  Building blocks for digital commerce
-</p>
-<p align="center">
-  <a href="https://github.com/medusajs/medusa/blob/master/CONTRIBUTING.md">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="PRs welcome!" />
-  </a>
-    <a href="https://www.producthunt.com/posts/medusa"><img src="https://img.shields.io/badge/Product%20Hunt-%231%20Product%20of%20the%20Day-%23DA552E" alt="Product Hunt"></a>
-  <a href="https://discord.gg/xpCwq3Kfn8">
-    <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
-  </a>
-  <a href="https://twitter.com/intent/follow?screen_name=medusajs">
-    <img src="https://img.shields.io/twitter/follow/medusajs.svg?label=Follow%20@medusajs" alt="Follow @medusajs" />
-  </a>
-</p>
+## Features
+
+- **Role Management**: Create, update, and delete roles
+- **Permission System**: Predefined and custom permissions for API endpoints
+- **Policy Engine**: Allow/deny policies for granular access control
+- **Permission Categories**: Organize permissions into logical groups
+- **Admin UI**: React components for managing RBAC through the admin dashboard
+- **Database Migrations**: Automatic database schema setup
+- **Seeding Script**: Populate with predefined permissions
+- **Workflows**: Business logic for RBAC operations
+- **Authorization API**: Check user permissions programmatically
+
+## Installation
+
+1. Add the plugin to your `medusa-config.js`:
+
+```js
+const plugins = [
+  // ... other plugins
+  {
+    resolve: "./src", // Local plugin path
+    options: {
+      // Plugin options (if any)
+    }
+  }
+]
+```
+
+2. Run database migrations:
+
+```bash
+npx medusa db:migrate
+```
+
+3. Seed the database with predefined permissions:
+
+```bash
+npx medusa exec src/scripts/seed-rbac.ts
+```
+
+## Core Concepts
+
+### Permission
+A permission defines an action that can be performed. Each permission has:
+- **Name**: Human-readable name
+- **Type**: `predefined` or `custom`
+- **Matcher Type**: Currently supports `api` (API endpoints)
+- **Matcher**: The API path (e.g., `/admin/products`)
+- **Action Type**: `read`, `write`, or `delete`
+- **Category**: Optional grouping
+
+### Role
+A role is a collection of policies that can be assigned to users. Roles define what a user can or cannot do.
+
+### Policy
+A policy connects a permission to a role with a decision (`allow` or `deny`). Policies determine the actual access control.
+
+### Permission Category
+Categories help organize permissions into logical groups like "Products", "Orders", "Customers", etc.
+
+## API Endpoints
+
+### Roles
+- `GET /admin/rbac/roles` - List all roles
+- `POST /admin/rbac/roles` - Create a new role
+- `DELETE /admin/rbac/roles` - Delete a role
+
+### Permissions
+- `GET /admin/rbac/permissions` - List all permissions
+- `POST /admin/rbac/permissions` - Create a custom permission
+- `GET /admin/rbac/permissions/:id` - Get permission details
+- `DELETE /admin/rbac/permissions/:id` - Delete a custom permission
+
+### Categories
+- `GET /admin/rbac/categories` - List permission categories
+- `POST /admin/rbac/categories` - Create a permission category
+
+### Authorization Check
+- `POST /admin/rbac/check` - Check if a user has permission for a specific action
+
+## Usage Examples
+
+### Creating a Role
+
+```typescript
+import { CreateRoleRequest, PolicyType } from "./src/modules/rbac/types"
+
+const roleData: CreateRoleRequest = {
+  name: "Product Manager",
+  policies: [
+    {
+      permission: { id: "permission-id-for-read-products" },
+      type: PolicyType.ALLOW
+    },
+    {
+      permission: { id: "permission-id-for-write-products" },
+      type: PolicyType.ALLOW
+    },
+    {
+      permission: { id: "permission-id-for-delete-products" },
+      type: PolicyType.DENY
+    }
+  ]
+}
+
+// POST to /admin/rbac/roles with roleData
+```
+
+### Creating a Custom Permission
+
+```typescript
+import { 
+  CreatePermissionRequest, 
+  PermissionType, 
+  PermissionMatcherType, 
+  ActionType 
+} from "./src/modules/rbac/types"
+
+const permissionData: CreatePermissionRequest = {
+  name: "Read Custom Reports",
+  type: PermissionType.CUSTOM,
+  matcherType: PermissionMatcherType.API,
+  matcher: "/admin/custom-reports",
+  actionType: ActionType.READ,
+  category: { id: "analytics-category-id" }
+}
+
+// POST to /admin/rbac/permissions with permissionData
+```
+
+## Database Schema
+
+The plugin creates the following tables:
+
+- `rbac_permission_category` - Permission categories
+- `rbac_permission` - Individual permissions
+- `rbac_role` - User roles
+- `rbac_policy` - Policies linking roles and permissions
+
+## Predefined Permissions
+
+The seeding script creates predefined permissions for common Medusa resources:
+
+- **Products**: Read, Write, Delete permissions for `/admin/products`
+- **Orders**: Read, Write, Delete permissions for `/admin/orders`
+- **Customers**: Read, Write, Delete permissions for `/admin/customers`
+- **Users**: Read, Write, Delete permissions for `/admin/users`
+
+## Development
+
+To extend this plugin:
+
+1. Add custom permissions using the API
+2. Create custom roles with specific policy combinations
+3. Implement middleware to check permissions in your custom routes
+4. Extend the admin UI with additional React components
 
 ## Compatibility
 
-This starter is compatible with versions >= 2.4.0 of `@medusajs/medusa`. 
+This plugin is compatible with MedusaJS v2 (versions >= 2.4.0).
 
-## Getting Started
+## License
 
-Visit the [Quickstart Guide](https://docs.medusajs.com/learn/installation) to set up a server.
-
-Visit the [Plugins documentation](https://docs.medusajs.com/learn/fundamentals/plugins) to learn more about plugins and how to create them.
-
-Visit the [Docs](https://docs.medusajs.com/learn/installation#get-started) to learn more about our system requirements.
-
-## What is Medusa
-
-Medusa is a set of commerce modules and tools that allow you to build rich, reliable, and performant commerce applications without reinventing core commerce logic. The modules can be customized and used to build advanced ecommerce stores, marketplaces, or any product that needs foundational commerce primitives. All modules are open-source and freely available on npm.
-
-Learn more about [Medusa’s architecture](https://docs.medusajs.com/learn/introduction/architecture) and [commerce modules](https://docs.medusajs.com/learn/fundamentals/modules/commerce-modules) in the Docs.
-
-## Community & Contributions
-
-The community and core team are available in [GitHub Discussions](https://github.com/medusajs/medusa/discussions), where you can ask for support, discuss roadmap, and share ideas.
-
-Join our [Discord server](https://discord.com/invite/medusajs) to meet other community members.
-
-## Other channels
-
-- [GitHub Issues](https://github.com/medusajs/medusa/issues)
-- [Twitter](https://twitter.com/medusajs)
-- [LinkedIn](https://www.linkedin.com/company/medusajs)
-- [Medusa Blog](https://medusajs.com/blog/)
+MIT License - Feel free to use this plugin in your commercial and personal projects. 

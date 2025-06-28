@@ -1,8 +1,8 @@
 {
-  "name": "medusa-starter-plguin",
-  "version": "0.0.1",
-  "description": "A starter for Medusa plugins.",
-  "author": "Medusa (https://medusajs.com)",
+  "name": "medusa-plugin-rbac",
+  "version": "1.0.0",
+  "description": "Role-Based Access Control plugin for MedusaJS v2",
+  "author": "Medusa RBAC Plugin",
   "license": "MIT",
   "files": [
     ".medusa/server"
@@ -18,9 +18,14 @@
   "keywords": [
     "medusa",
     "plugin",
-    "medusa-plugin-other",
+    "medusa-plugin-rbac",
     "medusa-plugin",
-    "medusa-v2"
+    "medusa-v2",
+    "rbac",
+    "role-based",
+    "access-control",
+    "permissions",
+    "authorization"
   ],
   "scripts": {
     "build": "medusa plugin:build",
@@ -31,10 +36,10 @@
     "@medusajs/admin-sdk": "2.4.0",
     "@medusajs/cli": "2.4.0",
     "@medusajs/framework": "2.4.0",
+    "@medusajs/icons": "2.4.0",
     "@medusajs/medusa": "2.4.0",
     "@medusajs/test-utils": "2.4.0",
     "@medusajs/ui": "4.0.4",
-    "@medusajs/icons": "2.4.0",
     "@mikro-orm/cli": "6.4.3",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/knex": "6.4.3",
@@ -58,10 +63,10 @@
     "@medusajs/admin-sdk": "2.4.0",
     "@medusajs/cli": "2.4.0",
     "@medusajs/framework": "2.4.0",
-    "@medusajs/test-utils": "2.4.0",
-    "@medusajs/medusa": "2.4.0",
-    "@medusajs/ui": "4.0.3",
     "@medusajs/icons": "2.4.0",
+    "@medusajs/medusa": "2.4.0",
+    "@medusajs/test-utils": "2.4.0",
+    "@medusajs/ui": "4.0.3",
     "@mikro-orm/cli": "6.4.3",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/knex": "6.4.3",
@@ -72,5 +77,6 @@
   },
   "engines": {
     "node": ">=20"
-  }
+  },
+  "packageManager": "yarn@4.6.0+sha512.5383cc12567a95f1d668fbe762dfe0075c595b4bfff433be478dbbe24e05251a8e8c3eb992a986667c1d53b6c3a9c85b8398c35a960587fbd9fa3a0915406728"
 }
